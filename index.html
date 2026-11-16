@@ -75,7 +75,8 @@ select{text-align:left;padding:12px}
 .fld{position:relative}
 .fld i{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-style:normal;font-size:11px;color:var(--muted);pointer-events:none}
 .fld .w{padding-right:24px}
-.addset{width:100%;background:none;color:var(--muted);font-size:14px;padding:8px;margin-top:2px}
+.setbtns{display:flex;gap:8px}
+.addset{flex:1;width:100%;background:none;color:var(--muted);font-size:14px;padding:8px;margin-top:2px}
 .fab{position:fixed;left:20px;right:20px;bottom:calc(env(safe-area-inset-bottom) + 76px);max-width:520px;margin:0 auto;padding:16px;border-radius:18px;background:var(--btn);color:var(--btnfg);font-weight:700;font-size:17px;box-shadow:0 8px 28px rgba(0,0,0,.22);transition:transform .25s,opacity .25s;z-index:5}
 .fab.hide{transform:translateY(160%);opacity:0;pointer-events:none}
 /* ---------- run ---------- */
@@ -227,7 +228,7 @@ function exCard(ex){
     <input class="reps" inputmode="numeric" pattern="[0-9]*" data-ex="${ex.id}" data-i="${i}" data-k="r" value="${esc(r.r)}" placeholder="${p?p.r:'–'}">
     ${ex.weighted?`<input class="w" inputmode="decimal" data-ex="${ex.id}" data-i="${i}" data-k="w" value="${esc(r.w)}" placeholder="0">`:''}
     <input class="rest" inputmode="decimal" data-ex="${ex.id}" data-i="${i}" data-k="rest" value="${esc(r.rest)}"></div>`});
-  return h+`<button class="addset" data-add="${ex.id}">+ เพิ่มเซ็ต</button></div>`;
+  return h+`<div class="setbtns">${rows.length>1?`<button class="addset" data-del="${ex.id}">− ลบเซ็ต</button>`:''}<button class="addset" data-add="${ex.id}">+ เพิ่มเซ็ต</button></div></div>`;
 }
 function renderGym(){
   const days=D.days;if(!days.find(d=>d.id===gymDay))gymDay=days[0]&&days[0].id;
@@ -255,6 +256,7 @@ $('#p-gym').addEventListener('input',e=>{const t=e.target;
 $('#p-gym').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.day){gymDay=b.dataset.day;renderGym();scrollTo({top:0})}
   else if(b.dataset.add){const id=b.dataset.add,d=draft();if(!d.data[id])d.data[id]=rowsFor(EX(id)).map(r=>({...r}));const rows=d.data[id],l=rows[rows.length-1]||{};rows.push({r:'',w:l.w||'',rest:l.rest||''});save();renderGym()}
+  else if(b.dataset.del){const id=b.dataset.del,d=draft();if(!d.data[id])d.data[id]=rowsFor(EX(id)).map(r=>({...r}));const rows=d.data[id];if(rows.length<=1)return;const l=rows[rows.length-1];if(num(l.r)>0&&!confirm('เซ็ตสุดท้ายกรอกตัวเลขไว้แล้ว ลบเลยไหม?'))return;rows.pop();save();renderGym()}
   else if(b.dataset.act==='discard'){if(confirm('ล้างตัวเลขที่กรอกไว้ทั้งหมด?')){D.draft=null;save();renderGym()}}
 });
 $('#fab').onclick=()=>{const d=D.draft;if(!d)return;let n=0;const base=Date.now();
