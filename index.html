@@ -432,7 +432,9 @@ document.querySelector('nav').onclick=e=>{const b=e.target.closest('button');if(
   document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='p-'+cur);document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));R[cur]();updFab();scrollTo({top:0})};
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if(cur==='stat')renderStat()},200)});
 renderGym();autoSync();
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){const had=!!navigator.serviceWorker.controller;let rl=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!rl){rl=true;location.reload()}});
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')r.update()})}).catch(()=>{})}
 </script>
 </body>
 </html>
